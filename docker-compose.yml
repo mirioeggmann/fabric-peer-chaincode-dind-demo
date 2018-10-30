@@ -1,0 +1,45 @@
+version: "2.0"
+
+services:
+  dind-peer0:
+    hostname: dind-peer0
+    image: docker:dind
+    privileged: true
+    ports:
+      - '2375:2375'
+      - '2376:2376'
+
+  peer0:
+    image: "hyperledger/fabric-peer:x86_64-1.1.0"
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    environment:
+      - CORE_PEER_ID=peer0
+      - CORE_PEER_LOCALMSPID=TbmelabsMSP
+      - CORE_PEER_ADDRESS=peer0:7051
+      - CORE_VM_ENDPOINT=tcp://dind-peer0:2375
+      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/crypto/peer/tls/server.key
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/crypto/peer/tls/server.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/crypto/peer/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/crypto/peer/msp
+      - CORE_PEER_CHAINCODEADDRESS=peer0:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0:7051
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb-peer0:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    depends_on:
+      - couchdb-peer0
+    command: peer node start
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../data/crypto-config/peerOrganizations/tbmelabs.ch/peers/peer0.tbmelabs.ch/:/etc/hyperledger/crypto/peer
+      - ../data/peers/peer0/data:/var/hyperledger/production
+    ports:
+      - "7051:7051"
+      - "7053:7053"
