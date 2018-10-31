@@ -1,7 +1,6 @@
-# Fabric-Peer Chaincode DinD Demo
+# Hyperledger Fabric Peer Chaincode DinD Demo
 
-Built with the fabric-samples [basic-network](https://github.com/hyperledger/fabric-samples/tree/release-1.1/basic-network).
-Demo is realized with docker-compose and not swarm, because there is currently no priviledged=true option for containers in swarm.
+Modified version of the [fabric-samples](https://github.com/hyperledger/fabric-samples/tree/release-1.1/) basic-network.
 
 ## Commands
 
@@ -42,8 +41,6 @@ peer0.org1.example.com:
     depends_on:
       - orderer.example.com
       - couchdb
-    links:
-      - dind-peer0
 ```
 
 ## peer0 with dind sidecar
@@ -83,7 +80,7 @@ dind-peer0:
     image: docker:dind
     privileged: true
     ports:
-      - '2375:2375'
-      - '2376:2376'
+      - 2375:2375
+      - 2376:2376
 ```
 
